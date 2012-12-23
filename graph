@@ -1,0 +1,181 @@
+#include<iostream>
+#include<queue>
+using namespace std;
+class Edge
+{
+public:
+  int start;
+	int end;
+	int weight;
+	Edge(){}
+	//Edge(int st,int en,int w);
+	bool operator<(Edge oneEdge);
+	bool operator>(Edge oneEdge);
+};
+
+class Graph
+{
+private:
+	int matrix[9][9];
+public:
+	int * Mark;
+	int vertexNum;
+	int edgeNum;
+	Graph(int verticesNum)
+	{
+		edgeNum=0;
+		int i,j;
+		vertexNum=verticesNum;
+		Mark=new int[vertexNum];
+		for(i=0;i<vertexNum;i++)
+		{
+			for(j=0;j<vertexNum;j++)
+				matrix[i][j]=0;
+			Mark[i]=0;
+		}
+	}
+	~Graph(){}
+	void DFS(int v);
+	void BFS(int v);
+	void BFSTraverse(int v);
+	void DFSTraverse(int v);
+	Edge FirstEdge(int oneVertex){
+		Edge tmpEdge;
+		tmpEdge.start=oneVertex;
+		for(int i=0;i<vertexNum;i++){
+			if(matrix[oneVertex][i]!=0){
+				tmpEdge.end=i;
+				tmpEdge.weight=matrix[oneVertex][i];
+				break;
+			}
+		}
+		return tmpEdge;
+	}
+	Edge NextEdge(Edge oneEdge){
+		Edge tmpEdge;
+		tmpEdge.start=oneEdge.start;
+		for(int i=oneEdge.end+1;i<vertexNum;i++){
+			if(matrix[oneEdge.start][i]!=0){
+				tmpEdge.end=i;
+				tmpEdge.weight=matrix[oneEdge.start][i];
+				break;
+			}
+		}
+		return tmpEdge;
+	}
+	bool IsEdge(Edge oneEdge)
+	{
+		if(oneEdge.weight>0&&oneEdge.end>=0)
+			return true;
+		else return false;
+	}
+	int StartVertex(Edge oneEdge)
+	{
+		return oneEdge.start;
+	}
+	int EndVertex(Edge oneEdge)
+	{
+		return oneEdge.end;
+	}
+	void setEdge(int start,int end,int weight){
+		if(matrix[start][end]==0)
+			edgeNum++;
+				matrix[start][end]=weight;
+	}
+	void delEdge(int start,int end){
+		if(matrix[start][end]!=0){
+			edgeNum--;
+		}
+		matrix[start][end]=0;
+	}
+	void visit(int v)
+	{
+		cout<<v;
+	}
+};
+void Graph::DFS(int v)
+{
+	Mark[v]=1;
+	visit(v);
+	for(Edge e=FirstEdge(v);IsEdge(e);e=NextEdge(e))
+	{
+		if(Mark[EndVertex(e)]==0)
+			DFS(EndVertex(e));
+	}
+}
+void Graph::DFSTraverse(int v)
+{
+	for(int i=0;i<vertexNum;i++)
+	{
+		Mark[i]=0;
+	}
+	if(Mark[v]==0)
+		DFS(v);
+}
+void Graph::BFS(int v)
+{
+	using std::queue;
+	queue <int> Q;
+	Mark[v]=1;
+	visit(v);
+	Q.push(v);
+	while(!Q.empty())
+	{
+		v=Q.front();
+		Q.pop();
+		for(Edge e=FirstEdge(v);IsEdge(e);e=NextEdge(e))
+		{
+			if(Mark[EndVertex(e)]==0)
+			{
+				visit(EndVertex(e));
+				Mark[EndVertex(e)]=1;
+				Q.push(EndVertex(e));
+			}
+		}
+	}
+}
+void Graph::BFSTraverse(int v)
+{
+	for(int i=0;i<vertexNum;i++)
+	{
+		Mark[i]=0;
+	}
+	if(Mark[v]==0)
+		BFS(v);
+}
+int main()
+{
+	Graph a(9);
+	/*a.setEdge(1,2,1);
+	a.setEdge(1,3,1);
+	a.setEdge(2,4,1);
+	a.setEdge(2,5,1);
+	a.setEdge(4,8,1);
+	a.setEdge(5,8,1);
+	a.setEdge(3,6,1);
+	a.setEdge(3,7,1);
+	a.setEdge(6,7,1);
+
+	a.setEdge(2,1,1);
+	a.setEdge(3,1,1);
+	a.setEdge(4,2,1);
+	a.setEdge(5,2,1);
+	a.setEdge(8,4,1);
+	a.setEdge(8,5,1);
+	a.setEdge(6,3,1);
+	a.setEdge(7,3,1);
+	a.setEdge(7,6,1);*/
+	cout<<"输入数据（vf,ve,we）";
+	int n=1,m=1,l=1;
+	while(n!=0&&m!=0&&l!=0)
+	{		
+		cin>>n;
+		cin>>m;
+		cin>>l;
+		a.setEdge(n,m,l);
+	}
+	a.DFSTraverse(1);
+	cout<<endl;
+	a.BFSTraverse(1);
+	return 0;
+}
