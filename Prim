@@ -1,0 +1,178 @@
+//未成功
+#include<iostream>
+using namespace std;
+class Edge
+{
+public:
+  int start;
+	int end;
+	int weight;
+	Edge(){}
+	Edge(int st,int en,int w)
+	{
+		start=st;
+		end=en;
+		weight=w;
+	}
+	bool operator<(Edge oneEdge);
+	bool operator>(Edge oneEdge);
+};
+class Graph
+{
+public:
+	int matrix[10][10];
+public:
+	int * Mark;
+	int vertexNum;
+	int edgeNum;
+	Graph(int verticesNum)
+	{
+		edgeNum=0;
+		int i,j;
+		vertexNum=verticesNum;
+		Mark=new int[vertexNum];
+		for(i=0;i<vertexNum;i++)
+		{
+			for(j=0;j<vertexNum;j++)
+				matrix[i][j]=0;
+			Mark[i]=0;
+		}
+	}
+	~Graph(){}
+	int VerticesNum()
+	{ return vertexNum; }
+	void DFS(int v);
+	void DFSTraverse(int v);
+	Edge FirstEdge(int oneVertex){
+		Edge tmpEdge;
+		tmpEdge.start=oneVertex;
+		for(int i=0;i<vertexNum;i++){
+			if(matrix[oneVertex][i]!=0){
+				tmpEdge.end=i;
+				tmpEdge.weight=matrix[oneVertex][i];
+				break;
+			}
+		}
+		return tmpEdge;
+	}
+	Edge NextEdge(Edge oneEdge){
+		Edge tmpEdge;
+		tmpEdge.start=oneEdge.start;
+		for(int i=oneEdge.end+1;i<vertexNum;i++){
+			if(matrix[oneEdge.start][i]!=0){
+				tmpEdge.end=i;
+				tmpEdge.weight=matrix[oneEdge.start][i];
+				break;
+			}
+		}
+		return tmpEdge;
+	}
+	bool IsEdge(Edge oneEdge)
+	{
+		if(oneEdge.weight>0&&oneEdge.end>=0)
+			return true;
+		else return false;
+	}
+	int StartVertex(Edge oneEdge)
+	{
+		return oneEdge.start;
+	}
+	int EndVertex(Edge oneEdge)
+	{
+		return oneEdge.end;
+	}
+	void setEdge(int start,int end,int weight){
+		if(matrix[start][end]==0)
+			edgeNum++;
+				matrix[start][end]=weight;
+	}
+	void delEdge(int start,int end){
+		if(matrix[start][end]!=0){
+			edgeNum--;
+		}
+		matrix[start][end]=0;
+	}
+	void visit(int v)
+	{
+		cout<<v;
+	}
+};
+void Graph::DFS(int v)
+{
+	Mark[v]=1;
+	visit(v);
+	for(Edge e=FirstEdge(v);IsEdge(e);e=NextEdge(e))
+	{
+		if(Mark[EndVertex(e)]==0)
+			DFS(EndVertex(e));
+	}
+}
+void Graph::DFSTraverse(int v)
+{
+	for(int i=0;i<vertexNum;i++)
+	{
+		Mark[i]=0;
+	}
+	if(Mark[v]==0)
+		DFS(v);
+}
+
+void Prim(Graph G,int vcount,int father[])
+{
+    int i,j,k;
+    int lowcost[6],closeset[6],used[6];
+    for (i=0;i<vcount;i++)
+        {
+			lowcost[i]=G.matrix[0][i];
+        closeset[i]=0; 
+        used[i]=0;
+        father[i]=-1; 
+        }
+    used[0]=1; 
+    for (i=1;i<vcount;i++)
+        {
+        j=0;
+        while (used[j]) j++;
+        for (k=0;k<vcount;k++)
+            if ((!used[k])&&(lowcost[k]<lowcost[j])) j=k;
+        father[j]=closeset[j]; 
+        used[j]=1;
+		cout<<father[i];
+        for (k=0;k<vcount;k++)
+            if (!used[k]&&(G.matrix[j][k]<lowcost[k]))
+                { lowcost[k]=G.matrix[j][k];
+                closeset[k]=j; 
+				}
+	}
+}
+
+int main()
+{
+	Graph a(10);
+	//上帝啊，还有神马办法可以更优化这个坑爹的过程呢。
+	a.setEdge(1,2,6);
+	a.setEdge(1,4,5);
+	a.setEdge(1,3,1);
+	a.setEdge(2,3,5);
+	a.setEdge(2,5,3);
+	a.setEdge(2,1,6);
+	a.setEdge(3,1,1);
+	a.setEdge(3,2,5);
+	a.setEdge(3,4,5);
+	a.setEdge(3,5,6);
+	a.setEdge(3,6,4);
+	a.setEdge(4,1,5);
+	a.setEdge(4,3,5);
+	a.setEdge(4,6,2);
+	a.setEdge(5,2,3);
+	a.setEdge(5,3,6);
+	a.setEdge(5,6,6);
+	a.setEdge(6,3,4);
+	a.setEdge(6,4,2);
+	a.setEdge(6,5,6);
+	a.DFSTraverse(1);
+	cout<<endl;
+	int father[6];
+	Prim(a,6,father);
+	return 0;
+}
